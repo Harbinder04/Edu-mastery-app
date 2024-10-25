@@ -192,7 +192,7 @@ export const completeUpload = async (req, res) => {
             }
         });
 
-        pushVideoForEncodingToKafka({ title, description, author, videoUrl: uploadResult.Location });
+        // pushVideoForEncodingToKafka({ title, description, author, videoUrl: uploadResult.Location });
         return res.status(200).json({ message: "Uploaded successfully!!!", course: course.course_id });
     } catch (error) {
         console.error('Error completing upload:', error);
