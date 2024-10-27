@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    ::selection {
+        background-color: #b02525;
+        color: #e8e6e6;
+    }
+}
+
+video {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+}
+
+.text-gradient {
+    background: linear-gradient(to right, #f56565, #ed8936);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .icon-gradient {
+    fill: url(#gradient);
+  }
