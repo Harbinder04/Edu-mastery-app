@@ -106,7 +106,7 @@ export const uploadChunk = async (req, res) => {
     try {
         console.log('Uploading chunk');
         const { filename, chunkIndex, uploadId, totalChunks } = req.body;
-        console.log(typeof uploadId, uploadId);
+        // console.log(typeof uploadId, uploadId);
         const s3 = new S3Client({
             region: process.env.AWS_REGION,
         credentials: {
@@ -124,7 +124,7 @@ export const uploadChunk = async (req, res) => {
                 };
 
         const data = await s3.send(new UploadPartCommand(uploadParams));
-        console.log("data", data);
+        // console.log("data", data);
         res.status(200).json({ message: "Chunk uploaded successfully" });
     } catch (error) {
         console.log("Error", error);

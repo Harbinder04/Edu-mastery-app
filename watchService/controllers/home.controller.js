@@ -15,7 +15,7 @@ const getAllVideos = async(req, res) => {
               userId: true,
             }
         });
-        console.log(allData);
+        // console.log(allData);
         if(!allData) {
           return res.status(404).send('No videos found');
         }
