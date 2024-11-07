@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Video from 'next-video';
 import { useSearchParams } from "next/navigation";
+import Player from 'next-video/player';
+import Nav from "@/components/nav";
 
 function Page() {
   const searchParams = useSearchParams();
@@ -25,7 +26,7 @@ function Page() {
           const courseData = res.data.courseData;
           console.log(courseData);
           // console.log(res.data.signedUrl);
-          // setVideoUrl(res.data.signedUrl);
+          setVideoUrl(res.data.signedUrl);
           setVideoData({
             course_title: courseData.course_title,
             course_description: courseData.course_description,
@@ -55,14 +56,21 @@ function Page() {
           Loading...
         </div>
       ) : (
-        <div className="container mx-auto my-10">
-          <Video src={videoUrl} />
-          <div className="mt-4">
-            <h1 className="text-white text-3xl font-bold">{videoData.course_title}</h1>
-            <p className="text-white mt-2">Author - {videoData.course_author}</p>
-            <p className="text-white mt-2">{videoData.course_description}</p>
-            <p className="text-white mt-2">Created at: {new Date(videoData.created_at).toLocaleDateString()}</p>
+        <div>
+          <Nav />
+        <div className="container mx-auto mb-10 p-5">
+        <p className="text-white my-3 font-semibold tracking-wide"> Video created by {videoData.course_author} & 
+            <span> Created at: {new Date(videoData.created_at).toLocaleDateString()}</span>
+            </p>
+          <Player src={videoUrl} />
+          <div className="mt-4 mx-3">
+            <h1 className="text-white text-3xl font-bold tracking-wide">{videoData.course_title}</h1>
+            <p className="text-white mt-2 tracking-wide">{videoData.course_description}
+
+            </p>
+            {/* <p className="text-white mt-2">Created at: {new Date(videoData.created_at).toLocaleDateString()}</p> */}
           </div>
+        </div>
         </div>
       )}
     </div>
