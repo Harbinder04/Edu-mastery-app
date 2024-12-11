@@ -1,8 +1,9 @@
 "use client";
-import React, { useState, ChangeEvent} from "react";
+import React, { useState, ChangeEvent, useEffect} from "react";
 import axios from "axios";
 import { useSession } from 'next-auth/react';
 import { toast } from "sonner";
+import { useRouter } from 'next/navigation';
 
 
 interface FileUploadResponse {
@@ -14,7 +15,16 @@ const UploadForm: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [author, setAuthor] = useState<string>("");
-  const user = useSession().data; // This is the user object from the session
+  const session = useSession(); // This is the user object from the session
+  const router = useRouter();
+  useEffect(() => {
+    if (session.status === "unauthenticated") {
+      router.push("/signup");
+    }
+  }
+  , [session.status, router]);
+
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
@@ -29,12 +39,12 @@ const UploadForm: React.FC = () => {
 
     if (!selectedFile) {
       // Add toast notification
-      alert("No file selected.");
+      toast.message("Please select a file to upload.", {position: "top-right", duration: 5000} );
       return;
     }
 
     try {
-      toast.loading("Uploading file...", {position: "top-right"});
+      const toastUploading = toast.loading("Uploading file...", {position: "top-right"});
       ////////////////////////////////////////////////////
       const formData = new FormData();
       formData.append("filename", selectedFile.name);
@@ -84,7 +94,7 @@ const UploadForm: React.FC = () => {
 
       ////////////////////////////////////////////////////
 
-      const userId = user?.user?.user_id?.toString();
+      const userId = session.data?.user.user_id;
 
       if (!userId) {
         throw new Error("User ID is not available in the session.");
@@ -101,6 +111,7 @@ const UploadForm: React.FC = () => {
           user_id: userId,
         }
       );
+      toast.dismiss(toastUploading);
       if(completeRes.status === 200){
         toast.success("File uploaded successfully",{position: "top-right", duration: 5000});
       }

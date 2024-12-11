@@ -4,21 +4,21 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("reached here")
+    // console.log("reached here")
     const body = await req.json();
     const { name, email, password } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
-    console.log("check point 2")
+    // console.log("check point 2")
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json({ message: 'User already exists' }, { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log("check point 3")
+    // console.log("check point 3")
     const user = await prisma.user.create({
       data: {
         name,

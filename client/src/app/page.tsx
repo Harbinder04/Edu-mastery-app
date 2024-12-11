@@ -1,5 +1,5 @@
 "use client";
-// import Image from "next/image";
+
 import Nav from "@/components/nav";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";

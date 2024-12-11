@@ -27,7 +27,7 @@ function Nav() {
       </ul>
       {data ? (<div className='mr-16'>
         <button className='bg-[#D4312B] rounded-full px-3 py-2 text-white font-semibold mr-3' onClick={handleUploadCick} >Upload</button>
-        <button className='bg-[#D4312B] rounded-full px-3 py-2 text-white font-semibold' onClick={() => signOut()}>SignOut</button>
+        <button className='bg-[#D4312B] rounded-full px-3 py-2 text-white font-semibold' onClick={() => signOut({ callbackUrl: '/' })}>SignOut</button>
         </div>
       ) : (
         <button className='bg-[#D4312B] rounded-full px-3 py-2 text-white font-semibold mr-16' onClick={handleClick}>SignUp/LogIn</button>

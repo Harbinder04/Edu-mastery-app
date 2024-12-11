@@ -1,4 +1,4 @@
-import NextAuth, { getServerSession, NextAuthOptions, SessionStrategy } from "next-auth";
+import { NextAuthOptions, SessionStrategy } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@db/src/db.ts";
@@ -54,13 +54,13 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
+    async signIn({ account, profile, user}) {
       if (account?.provider === "google") {
         const existingUser = await prisma.user.findUnique({
           where: { email: profile?.email }
         });
         if (!existingUser) {
-          await prisma.user.create({
+          const dbuser = await prisma.user.create({
             data: {
               email: profile?.email as string,
               name: profile?.name,
@@ -68,12 +68,24 @@ export const authOptions: NextAuthOptions = {
               googleId: profile?.sub,
             },
           });
+          user.user_id = dbuser.user_id;
+        } else {
+          user.user_id = existingUser.user_id;
         }
       }
       return true;
     },
+    async jwt({ token, user }) {
+      if (user) {
+        token.user_id = user.user_id;
+        token.name = user.name;
+        token.email = user.email;
+        token.image = user.image;
+      }
+      return token;
+    }, 
 
-    async session({ session, token, user }) { 
+    async session({ session, token}) { 
       if (token) {
         session.user = {
           ...session.user,
@@ -85,22 +97,15 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async jwt({ token, user }) {
-      if (user) {
-        token.user_id = user.user_id;
-        token.name = user.name;
-        token.email = user.email;
-        token.image = user.image;
-      }
-      return token;
-    }
+    
   },
   pages: {
     signIn: "/auth/signin",
   },
   session: {
     strategy: "jwt" as SessionStrategy,
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // Update session every 24 hours
   },
   secret: process.env.JWT_SECRET,
 } satisfies NextAuthOptions;
