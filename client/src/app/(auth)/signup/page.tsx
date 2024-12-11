@@ -1,9 +1,10 @@
 "use client";
 import { useState, FormEvent } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, SignInResponse } from 'next-auth/react';
 import Link from 'next/link';
 import { FaGoogle } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface FormData {
   name: string;
@@ -28,27 +29,38 @@ export default function Signup() {
       });
 
       if (response.ok) {
-        // Automatically sign in
-        const signInResponse = await signIn('credentials', {
-          email: formData.email,
-          password: formData.password,
-          redirect: false, // Prevent automatic redirect
-        });
-
-        if (signInResponse?.ok) {
           router.push('/dashboard');
-        } else {
-          setError('Sign-in failed. Please check your credentials.');
-        }
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Signup failed. Please try again.');
+        } 
+       else { 
+        const data = await response.json();
+        setError(data.message);
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
     }
   };
 
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signIn('google', { 
+        redirect: false,  // Prevent automatic redirect
+        callbackUrl: '/dashboard' 
+      });
+  
+      if (result?.error) {
+        setError('Authentication failed. Please try again.');
+        toast.error('Authentication failed. Please try again.');
+        router.push('/signup');
+        return;
+      }
+      toast.message('Successfully signed in with Google!', { duration: 5000 });
+      // Manual redirect if needed
+      router.push('/dashboard');
+    } catch (error) {
+      setError('An unexpected error occurred.');
+    }
+  };
   return (
     <div className="flex justify-center items-center min-h-screen bg-primary">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
@@ -88,10 +100,12 @@ export default function Signup() {
           />
 
           <button type="submit" className='bg-gray-900 text-white rounded-xl hover:bg-gray-700 w-fit p-3 mx-auto'>Sign Up</button>
-          <button type="button" onClick={() => signIn('google')} className='flex items-center justify-center bg-red-500 text-white rounded-xl hover:bg-red-400 w-fit p-3 mx-auto mt-4'>
+
+            <button type="button" onClick={handleGoogleSignIn} 
+          className='flex items-center justify-center bg-red-500 text-white rounded-xl hover:bg-red-400 w-fit p-3 mx-auto mt-4'>
             <FaGoogle className="mr-2" />
             Continue with Google
-          </button>
+            </button>
         </form>
         {error && <div className="text-red-500 text-center mt-4">{error}</div>}
         <div className="text-center mt-4">

@@ -58,17 +58,18 @@ function Signin() {
 
     setCheckingPassword(true);
     const res = await signIn('credentials', {
-      username: email.current,
+      email: email.current,
       password: password.current,
       redirect: false,
     });
 
     toast.dismiss(loadId);
     if (!res?.error) {
-      router.push('/');
+      router.push('/dashboard');
       toast.success('Signed In');
     } else {
-      toast.error('Oops, something went wrong!');
+      toast.error('Oops, something went wrong! Retry again');
+      router.push('/signin');
       setCheckingPassword(false);
     }
   };
